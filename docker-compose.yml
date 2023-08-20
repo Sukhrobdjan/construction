@@ -1,0 +1,61 @@
+version: "3.8"
+
+
+services:
+
+  web:
+    restart: always
+    build:
+      dockerfile: apps/Dockerfile
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+    volumes:
+      - web-django:/usr/src/construction
+      - web-static:/usr/src/construction/static
+    command: python /usr/local/bin/gunicorn config.wsgi:application -w 2 -b :8000
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+    depends_on:
+      - postgres
+
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - web-static:/www/static
+    links:
+      - web:web
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  elasticsearch:
+    restart: always
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+        - "9200:9200"
+
+volumes:
+  pgdata:
+  web-django:
+  web-static:
+  elasticsearch-data:
+

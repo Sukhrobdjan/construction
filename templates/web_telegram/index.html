@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Shop</title>
+</head>
+<body>
+<div id="main">
+    <div id="usercard"> <!--Карта профиля, человека, который к нам обратился--></div>
+    <h1 id="user-data"></h1>
+    <p id="user-id"></p>
+    <form id="form">
+        <input type="text" placeholder="username">
+        <button id="order">Оформить</button>
+    </form>
+</div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    let tg = window.Telegram.WebApp; //получаем объект webapp телеграма
+    tg.expand(); //расширяем на все окно
+    let usercard = document.getElementById("usercard"); //получаем блок usercard
+    let userData = document.getElementById("user-data"); //получаем блок user-data
+    userData.innerText = tg.initDataUnsafe.user.first_name + " " +
+        tg.initDataUnsafe.user.last_name; //выводим имя и фамилию
+    let userId = document.getElementById("user-id"); //получаем блок user-id
+    userId.innerText = tg.initDataUnsafe.user.id; //выводим id
+
+    let orderBtn = document.getElementById("order"); //получаем кнопку оформить
+    let form = document.getElementById("form"); //получаем форму
+
+    orderBtn.addEventListener("click", function (e) { //при клике на кнопку
+        e.preventDefault(); //отменяем действие по умолчанию
+        let username = form.querySelector("input").value; //получаем значение из инпута
+        tg.send("sendMessage", { //отправляем сообщение
+            chat_id: tg.initDataUnsafe.user.id, //в чат с id пользователя
+            text: "Здравствуйте, " + username + "! Ваш заказ принят!" //с текстом
+        });
+    });
+
+</script>
+
+
+</body>
+</html>
